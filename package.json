@@ -1,15 +1,26 @@
-{
+{ 
+  "name": "gocam",
+  "version": "0.0.0",
+  "description": "A React native camera app",
+  "main": "App.js",
+  "author": "Jefree Sujit <e.jefree110@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
-    "ios": "react-native run-ios"
+    "ios": "react-native run-ios",
+    "resetWatch": "watchman watch-del-all"
   },
   "dependencies": {
-    "react": "16.5.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz"
+    "@babel/runtime": "7.0.0",
+    "react": "16.6.3",
+    "react-native": "^0.57.8",
+    "react-native-camera": "^1.8.0",
+    "watchman": "^1.0.0"
   },
   "devDependencies": {
-    "babel-preset-expo": "^5.0.0"
+    "babel-preset-expo": "^5.0.0",
+    "schedule": "0.4.0"
   },
   "private": true
 }
