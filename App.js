@@ -1,12 +1,27 @@
-import React, { Component } from 'react'
-import { View, TouchableOpacity, StyleSheet, PermissionsAndroid } from 'react-native'
+import React, { Component } from 'react';
+import { View, TouchableOpacity, StyleSheet, PermissionsAndroid, CameraRoll } from 'react-native'
+import { RNCamera, FaceDetector } from 'react-native-camera';
 
 class Inputs extends Component {
+  constructor() {
+    super();
+    this.state = {};
+    this.camera = {};
+    this.takePicture = this.takePicture.bind(this);
+  }
 
   async componentDidMount() {
     // await this.requestLocationPermission()
     this.getDeviceAccess();
   }
+
+  async takePicture () {
+    const options = { quality: 0.5, base64: true };
+    const data = await this.camera.takePictureAsync(options);
+    const savedPath = await CameraRoll.saveToCameraRoll(data.uri);
+    this.setState({ curImg: data.uri });
+    alert(data.uri+" newpath "+savedPath);
+  };
 
   getDeviceAccess () {
     let permission = PermissionsAndroid.requestMultiple([
@@ -23,19 +38,21 @@ class Inputs extends Component {
 
     permission.then((results) => {
       console.log(results);
-      alert(results);
+      //alert(results);
     });
   }
 
    render() {
       return (
          <View style = {styles.container}>
-            <View style={styles.camContainer}>
-            </View>
+            <RNCamera
+              ref={ref => { this.camera = ref; }}
+              style={styles.camContainer}
+            />
             <View style={styles.actionContainer}>
               <TouchableOpacity
                 style = {styles.camButton}
-                onPress={this.getDeviceAccess}>
+                onPress={this.takePicture}>
               </TouchableOpacity>
             </View>
          </View>
@@ -46,7 +63,8 @@ export default Inputs
 
 const styles = StyleSheet.create({
    container: {
-      paddingTop: 23
+      paddingTop: 0,
+      height: '100%'
    },
    camContainer: {
      height: '100%',
@@ -60,9 +78,11 @@ const styles = StyleSheet.create({
      width: '100%',
      display: 'flex',
      height: 100,
-     backgroundColor: 'gray',
+     backgroundColor: '#333',
      justifyContent: 'center',
-     alignItems: 'center'
+     alignItems: 'center',
+     zIndex: 99,
+     opacity: 0.7
    },
    input: {
       margin: 15,
@@ -85,7 +105,8 @@ const styles = StyleSheet.create({
       height: 75,
       borderRadius: 40,
       backgroundColor: 'white',
-      borderColor: 'red',
-      borderWidth: 1
+      borderColor: 'gray',
+      borderWidth: 1,
+      zIndex: 999
    }
 })
