@@ -1,18 +1,33 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, StyleSheet, PermissionsAndroid, CameraRoll } from 'react-native'
+import { View, TouchableOpacity, StyleSheet, PermissionsAndroid, CameraRoll } from 'react-native';
 import { RNCamera, FaceDetector } from 'react-native-camera';
+const { FlashMode, Type, WhiteBalance, VideoQuality } = RNCamera.Constants;
 
-class Inputs extends Component {
+class GoCamApp extends Component {
   constructor() {
     super();
-    this.state = {};
+    this.state = {
+      flashMode: FlashMode.auto,
+      type: Type.back,
+      showSettings: false,
+      mode: 'picture',
+      videoQuality: VideoQuality["1080p"]
+    };
     this.camera = {};
+
     this.takePicture = this.takePicture.bind(this);
+    this.handleCaptureClick = this.handleCaptureClick.bind(this);
+    this.captureVideo = this.captureVideo.bind(this);
   }
 
   async componentDidMount() {
-    // await this.requestLocationPermission()
     this.getDeviceAccess();
+  }
+
+  toggleProperty (property, value) {
+    let newState = {};
+    newState[property] = value;
+    this.setState(newState);
   }
 
   async takePicture () {
@@ -20,8 +35,20 @@ class Inputs extends Component {
     const data = await this.camera.takePictureAsync(options);
     const savedPath = await CameraRoll.saveToCameraRoll(data.uri);
     this.setState({ curImg: data.uri });
-    alert(data.uri+" newpath "+savedPath);
-  };
+    // alert(data.uri+" newpath "+savedPath);
+  }
+
+  async captureVideo () {
+    const options = { quality: this.state.videoQuality };
+    const data = await this.camera.recordAsync(options);
+    const savedPath = await CameraRoll.saveToCameraRoll(data.uri);
+    this.setState({ curImg: data.uri });
+  }
+
+  stopRecording() {
+    this.camera.stopRecording();
+    this.setState({ isRecording: false });
+  }
 
   getDeviceAccess () {
     let permission = PermissionsAndroid.requestMultiple([
@@ -42,12 +69,23 @@ class Inputs extends Component {
     });
   }
 
+  async handleCaptureClick () {
+    if (this.state.type === 'picture') {
+      await this.takePicture();
+    } else if (this.state.type === 'video') {
+      this.setState({ isRecording: false });
+      await this.captureVideo();
+    }
+  }
+
    render() {
       return (
          <View style = {styles.container}>
             <RNCamera
               ref={ref => { this.camera = ref; }}
               style={styles.camContainer}
+              flashMode={this.state.flashMode}
+              type={this.state.type}
             />
             <View style={styles.actionContainer}>
               <TouchableOpacity
@@ -59,7 +97,8 @@ class Inputs extends Component {
       )
    }
 }
-export default Inputs
+
+export default GoCamApp;
 
 const styles = StyleSheet.create({
    container: {
